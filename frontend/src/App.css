@@ -1,0 +1,62 @@
+/* App.css - Main application styles */
+
+#root {
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Leaflet popup customization */
+.leaflet-popup-content {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  margin: 8px;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 4px;
+}
+
+/* Ensure map container fills space */
+.leaflet-container {
+  font-family: inherit;
+}
+
+/* Antd custom overrides */
+.ant-layout {
+  background: #f0f2f5;
+}
+
+.ant-layout-header {
+  height: 64px;
+  line-height: 64px;
+}
+
+/* Search bar styling */
+.ant-form-item {
+  margin-bottom: 8px !important;
+}
+
+/* Drawer styling */
+.ant-drawer-body {
+  padding: 24px;
+}
+
+.ant-descriptions-item-label {
+  font-weight: 500;
+  background: #fafafa;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .ant-layout-header {
+    padding: 0 16px;
+  }
+
+  .ant-drawer {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
