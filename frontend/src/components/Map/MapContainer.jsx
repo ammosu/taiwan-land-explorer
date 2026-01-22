@@ -208,8 +208,13 @@ export default function MapContainer({ onLandClick, mapCenter, searchFilters }) 
   const onEachFeature = (feature, layer) => {
     layer.on({
       click: () => {
-        if (onLandClick && feature.properties) {
-          onLandClick(feature.properties);
+        if (onLandClick && feature) {
+          // 傳遞完整的 feature（包含 geometry），並合併 properties
+          const landData = {
+            ...feature.properties,
+            geometry: feature.geometry // 加入 geometry 供迷你地圖使用
+          };
+          onLandClick(landData);
         }
       },
       mouseover: (e) => {

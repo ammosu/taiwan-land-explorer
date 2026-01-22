@@ -3,6 +3,7 @@
  */
 import { Drawer, Descriptions, Typography, Divider, Empty } from 'antd';
 import { EnvironmentOutlined, UserOutlined, DollarOutlined } from '@ant-design/icons';
+import MiniMap from '../Map/MiniMap';
 
 const { Title, Text } = Typography;
 
@@ -39,10 +40,15 @@ export default function LandDetails({ land, visible, onClose }) {
     <Drawer
       title="土地詳細資訊"
       placement="right"
-      width={450}
+      width={520}
       onClose={onClose}
       open={visible}
     >
+      {/* 迷你地圖 - 顯示選中土地及周邊區域 */}
+      <MiniMap land={land} />
+
+      <Divider style={{ margin: 'var(--space-md) 0' }} />
+
       {/* Location Section */}
       <Title level={5} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
         <svg width="18" height="18" viewBox="0 0 20 20" fill="var(--color-accent)">
