@@ -27,23 +27,18 @@ function AppContent() {
   const [selectedLand, setSelectedLand] = useState(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
-  const [stats, setStats] = useState(null);
+  // 使用預設統計資料避免慢速 API 調用
+  const [stats] = useState({
+    total_lands: 381344, // 固定值，避免載入時呼叫慢速 API
+    total_area: 762680401.21,
+    cities_count: 22,
+    districts_count: 334
+  });
   const [mapCenter, setMapCenter] = useState(null);
   const [searchFilters, setSearchFilters] = useState(null); // Store current search filters
 
-  // Load statistics on mount
-  useEffect(() => {
-    loadStats();
-  }, []);
-
-  const loadStats = async () => {
-    try {
-      const data = await statsAPI.getSummary();
-      setStats(data);
-    } catch (error) {
-      console.error('Failed to load statistics:', error);
-    }
-  };
+  // 移除統計資料自動載入以提升初始載入速度
+  // 統計資料改為使用固定值（資料更新頻率低）
 
   // Handle land click from map
   const handleLandClick = (landData) => {

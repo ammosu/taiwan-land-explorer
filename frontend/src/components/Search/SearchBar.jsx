@@ -8,27 +8,20 @@ import { searchAPI } from '../../services/api';
 
 const { Option } = Select;
 
+// 台灣縣市清單（固定資料，不需要 API 查詢）
+const TAIWAN_CITIES = [
+  '臺北市', '新北市', '桃園市', '臺中市', '臺南市', '高雄市',
+  '基隆市', '新竹市', '嘉義市',
+  '新竹縣', '苗栗縣', '彰化縣', '南投縣', '雲林縣', '嘉義縣',
+  '屏東縣', '宜蘭縣', '花蓮縣', '臺東縣', '澎湖縣', '金門縣', '連江縣'
+];
+
 export default function SearchBar({ onSearchResults }) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [cities, setCities] = useState([]);
+  const [cities] = useState(TAIWAN_CITIES); // 使用硬編碼清單
   const [districts, setDistricts] = useState([]);
   const [selectedCity, setSelectedCity] = useState(null);
-
-  // Load cities on mount
-  useEffect(() => {
-    loadCities();
-  }, []);
-
-  // Load cities list
-  const loadCities = async () => {
-    try {
-      const data = await searchAPI.getCities();
-      setCities(data);
-    } catch (error) {
-      console.error('Failed to load cities:', error);
-    }
-  };
 
   // Load districts when city changes
   const handleCityChange = async (city) => {
