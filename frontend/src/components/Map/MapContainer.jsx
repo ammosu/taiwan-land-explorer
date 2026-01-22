@@ -19,8 +19,10 @@ L.Icon.Default.mergeOptions({
 /**
  * MapBoundsHandler - Fetch lands when map bounds change (with debounce)
  */
-function MapBoundsHandler({ onBoundsChange }) {
+function MapBoundsHandler({ onBoundsChange, onZoomChange }) {
   const timeoutRef = useRef(null);
+  const MIN_ZOOM_FOR_DATA = 11; // 只有 zoom >= 11 才載入資料（避免範圍太大）
+
   const map = useMapEvents({
     moveend: () => {
       // Clear previous timeout
@@ -30,8 +32,11 @@ function MapBoundsHandler({ onBoundsChange }) {
 
       // Debounce: wait 500ms after movement stops
       timeoutRef.current = setTimeout(() => {
-        const bounds = map.getBounds();
-        onBoundsChange(bounds);
+        const currentZoom = map.getZoom();
+        if (currentZoom >= MIN_ZOOM_FOR_DATA) {
+          const bounds = map.getBounds();
+          onBoundsChange(bounds);
+        }
       }, 500);
     },
     zoomend: () => {
@@ -40,20 +45,29 @@ function MapBoundsHandler({ onBoundsChange }) {
         clearTimeout(timeoutRef.current);
       }
 
-      // Zoom ends, load immediately
-      const bounds = map.getBounds();
-      onBoundsChange(bounds);
+      // Update zoom level
+      const currentZoom = map.getZoom();
+      if (onZoomChange) {
+        onZoomChange(currentZoom);
+      }
+
+      // Zoom ends, check zoom level before loading
+      if (currentZoom >= MIN_ZOOM_FOR_DATA) {
+        const bounds = map.getBounds();
+        onBoundsChange(bounds);
+      }
     }
   });
 
   useEffect(() => {
     // Initial load - only once
-    const timer = setTimeout(() => {
-      const bounds = map.getBounds();
-      onBoundsChange(bounds);
-    }, 100);
-
-    return () => clearTimeout(timer);
+    // 不要在初始載入時自動查詢資料（zoom 太小，範圍太大）
+    // 等用戶縮放或移動地圖後再載入
+    // const timer = setTimeout(() => {
+    //   const bounds = map.getBounds();
+    //   onBoundsChange(bounds);
+    // }, 100);
+    // return () => clearTimeout(timer);
   }, []); // Empty dependency array - only run once
 
   // Cleanup on unmount
@@ -115,7 +129,9 @@ export default function MapContainer({ onLandClick, mapCenter, searchFilters }) 
   const [loading, setLoading] = useState(false);
   const [center] = useState([23.5, 121]); // Taiwan center
   const [zoom] = useState(8);
+  const [currentZoom, setCurrentZoom] = useState(8); // Track current zoom level
   const requestInProgressRef = useRef(false); // Track if request is in progress
+  const MIN_ZOOM_FOR_DATA = 11; // 與 MapBoundsHandler 保持一致
 
   /**
    * Handle map bounds change - fetch lands in view
@@ -270,7 +286,7 @@ export default function MapContainer({ onLandClick, mapCenter, searchFilters }) 
         )}
 
         {/* Bounds Change Handler */}
-        <MapBoundsHandler onBoundsChange={handleBoundsChange} />
+        <MapBoundsHandler onBoundsChange={handleBoundsChange} onZoomChange={setCurrentZoom} />
 
         {/* Map Center Controller */}
         <MapCenterController mapCenter={mapCenter} />
@@ -299,6 +315,47 @@ export default function MapContainer({ onLandClick, mapCenter, searchFilters }) 
           {searchFilters.district && ` ${searchFilters.district}`}
           {searchFilters.parcel_no && ` · 地號:${searchFilters.parcel_no}`}
           {searchFilters.owner_name && ` · ${searchFilters.owner_name}`}
+        </div>
+      )}
+
+      {/* Zoom Hint - 提示用戶縮放地圖 */}
+      {!landData && currentZoom < MIN_ZOOM_FOR_DATA && !loading && (
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          background: 'rgba(255, 255, 255, 0.95)',
+          padding: 'var(--space-lg)',
+          borderRadius: 'var(--radius-lg)',
+          boxShadow: 'var(--shadow-xl)',
+          zIndex: 1000,
+          textAlign: 'center',
+          maxWidth: '320px',
+          backdropFilter: 'blur(10px)',
+          border: '2px solid var(--color-border)'
+        }}>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="var(--color-accent)" style={{ marginBottom: 'var(--space-md)' }}>
+            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            <path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/>
+          </svg>
+          <div style={{
+            fontFamily: 'var(--font-heading)',
+            fontSize: '1.125rem',
+            fontWeight: 600,
+            color: 'var(--color-primary)',
+            marginBottom: 'var(--space-sm)'
+          }}>
+            請縮放地圖以查看土地資料
+          </div>
+          <div style={{
+            fontSize: '0.875rem',
+            color: 'var(--color-text-muted)',
+            lineHeight: '1.5'
+          }}>
+            使用滑鼠滾輪或點擊地圖上的 + 按鈕<br/>
+            放大至特定區域即可顯示宗地
+          </div>
         </div>
       )}
     </div>
