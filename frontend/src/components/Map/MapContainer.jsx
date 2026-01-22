@@ -190,15 +190,15 @@ export default function MapContainer({ onLandClick, mapCenter, searchFilters }) 
   }, [searchFilters]); // Only re-create when searchFilters change
 
   /**
-   * Style for land polygons
+   * Style for land polygons - Professional color scheme
    */
   const getPolygonStyle = (feature) => {
     return {
-      fillColor: '#3388ff',
-      weight: 1,
-      opacity: 0.8,
-      color: '#0066cc',
-      fillOpacity: 0.4
+      fillColor: '#0369A1',      // Trust blue from design system
+      weight: 1.5,
+      opacity: 0.9,
+      color: '#0F172A',          // Professional dark border
+      fillOpacity: 0.35
     };
   };
 
@@ -215,8 +215,10 @@ export default function MapContainer({ onLandClick, mapCenter, searchFilters }) 
       mouseover: (e) => {
         const layer = e.target;
         layer.setStyle({
-          fillOpacity: 0.7,
-          weight: 2
+          fillOpacity: 0.6,
+          weight: 2.5,
+          color: '#0369A1',      // Accent blue on hover
+          fillColor: '#0284C7'   // Brighter blue on hover
         });
       },
       mouseout: (e) => {
@@ -274,40 +276,24 @@ export default function MapContainer({ onLandClick, mapCenter, searchFilters }) 
 
       {/* Loading Indicator */}
       {loading && (
-        <div style={{
-          position: 'absolute',
-          top: 10,
-          right: 10,
-          background: 'white',
-          padding: '5px 10px',
-          borderRadius: 4,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-          zIndex: 1000
-        }}>
+        <div className="loading-indicator">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ animation: 'spin 1s linear infinite' }}>
+            <circle cx="8" cy="8" r="6" stroke="var(--color-accent)" strokeWidth="2" strokeLinecap="round" strokeDasharray="9 30" />
+          </svg>
           載入中...
         </div>
       )}
 
       {/* Search Filter Indicator */}
       {searchFilters && (
-        <div style={{
-          position: 'absolute',
-          top: 10,
-          left: 10,
-          background: '#1890ff',
-          color: 'white',
-          padding: '8px 12px',
-          borderRadius: 4,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-          zIndex: 1000,
-          fontSize: '13px',
-          fontWeight: '500'
-        }}>
-          🔍 搜尋過濾中：
-          {searchFilters.city && ` ${searchFilters.city}`}
+        <div className="filter-badge">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style={{ display: 'inline-block', marginRight: '6px', verticalAlign: 'text-bottom' }}>
+            <path fillRule="evenodd" d="M8 4a.5.5 0 01.5.5V6a.5.5 0 01-1 0V4.5A.5.5 0 018 4zM3.732 5.732a.5.5 0 01.707 0l.915.914a.5.5 0 11-.708.708l-.914-.915a.5.5 0 010-.707zM2 10a.5.5 0 01.5-.5h1.586a.5.5 0 010 1H2.5A.5.5 0 012 10zm9.5 0a.5.5 0 01.5-.5h1.5a.5.5 0 010 1H12a.5.5 0 01-.5-.5zm.754-4.246a.389.389 0 00-.527-.02L7.547 9.31a.91.91 0 101.302 1.258l3.434-4.297a.389.389 0 00-.029-.518z"/>
+          </svg>
+          {searchFilters.city && `${searchFilters.city}`}
           {searchFilters.district && ` ${searchFilters.district}`}
-          {searchFilters.parcel_no && ` 地號:${searchFilters.parcel_no}`}
-          {searchFilters.owner_name && ` 所有權人:${searchFilters.owner_name}`}
+          {searchFilters.parcel_no && ` · 地號:${searchFilters.parcel_no}`}
+          {searchFilters.owner_name && ` · ${searchFilters.owner_name}`}
         </div>
       )}
     </div>

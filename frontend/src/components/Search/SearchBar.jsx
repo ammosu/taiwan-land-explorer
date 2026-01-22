@@ -104,20 +104,52 @@ export default function SearchBar({ onSearchResults }) {
   };
 
   return (
-    <div style={{ padding: '16px', background: 'white', borderRadius: 8, marginBottom: 16 }}>
+    <div style={{
+      padding: 'var(--space-lg)',
+      background: 'var(--color-surface)',
+      borderRadius: 'var(--radius-lg)',
+      marginBottom: 'var(--space-md)',
+      boxShadow: 'var(--shadow-md)',
+      border: '1px solid var(--color-border)'
+    }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 'var(--space-sm)',
+        marginBottom: 'var(--space-md)',
+        paddingBottom: 'var(--space-sm)',
+        borderBottom: '2px solid var(--color-border)'
+      }}>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="var(--color-accent)">
+          <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
+        </svg>
+        <span style={{
+          fontFamily: 'var(--font-heading)',
+          fontSize: '1rem',
+          fontWeight: 600,
+          color: 'var(--color-primary)'
+        }}>
+          搜尋土地資料
+        </span>
+      </div>
       <Form
         form={form}
         layout="vertical"
         onFinish={handleSearch}
       >
-        <Space wrap style={{ width: '100%' }} size="small">
+        <Space wrap style={{ width: '100%' }} size="middle">
           <Form.Item name="city" label="縣市" style={{ marginBottom: 0 }}>
             <Select
               placeholder="選擇縣市"
-              style={{ width: 120 }}
+              style={{ width: 140 }}
               onChange={handleCityChange}
               allowClear
               showSearch
+              suffixIcon={
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                  <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                </svg>
+              }
             >
               {cities.map(city => (
                 <Option key={city} value={city}>{city}</Option>
@@ -128,10 +160,15 @@ export default function SearchBar({ onSearchResults }) {
           <Form.Item name="district" label="鄉鎮市區" style={{ marginBottom: 0 }}>
             <Select
               placeholder="選擇鄉鎮市區"
-              style={{ width: 120 }}
+              style={{ width: 140 }}
               disabled={!selectedCity}
               allowClear
               showSearch
+              suffixIcon={
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                  <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                </svg>
+              }
             >
               {districts.map(district => (
                 <Option key={district} value={district}>{district}</Option>
@@ -140,7 +177,7 @@ export default function SearchBar({ onSearchResults }) {
           </Form.Item>
 
           <Form.Item name="parcel_no" label="地號" style={{ marginBottom: 0 }}>
-            <Input placeholder="輸入地號" style={{ width: 150 }} />
+            <Input placeholder="例如:17-1" style={{ width: 150 }} />
           </Form.Item>
 
           <Form.Item name="owner_name" label="所有權人" style={{ marginBottom: 0 }}>
@@ -154,6 +191,7 @@ export default function SearchBar({ onSearchResults }) {
                 htmlType="submit"
                 icon={<SearchOutlined />}
                 loading={loading}
+                style={{ minWidth: '100px' }}
               >
                 搜尋
               </Button>

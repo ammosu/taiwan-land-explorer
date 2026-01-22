@@ -110,70 +110,62 @@ function AppContent() {
     <Layout style={{ minHeight: '100vh' }}>
       {/* Header */}
       <Header style={{
-        background: '#001529',
-        padding: '0 24px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between'
       }}>
-        <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="24" height="24" rx="4" fill="#0369A1"/>
+            <path d="M12 12h8v8h-8v-8z" fill="white" opacity="0.6"/>
+            <path d="M8 8h4v4H8V8zM20 8h4v4h-4V8zM8 20h4v4H8v-4zM20 20h4v4h-4v-4z" fill="white"/>
+          </svg>
           <Title level={3} style={{ color: 'white', margin: 0 }}>
             台灣國有土地資料視覺化系統
           </Title>
         </div>
-        <div style={{ color: 'rgba(255,255,255,0.65)' }}>
+        <div>
           {stats && (
-            <Text style={{ color: 'rgba(255,255,255,0.85)' }}>
-              共 {stats.total_lands.toLocaleString()} 筆土地資料
-            </Text>
+            <span className="header-stats">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" opacity="0.7">
+                <path d="M2 3a1 1 0 011-1h10a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3z"/>
+              </svg>
+              <Text style={{ color: 'white', fontWeight: 500 }}>
+                共 {stats.total_lands.toLocaleString()} 筆資料
+              </Text>
+            </span>
           )}
         </div>
       </Header>
 
       {/* Main Content */}
       <Layout>
-        <Content style={{ padding: '16px' }}>
+        <Content>
           {/* Search Bar */}
           <SearchBar onSearchResults={handleSearchResults} />
 
           {/* Search Results List */}
           {searchResults.length > 0 && (
-            <div style={{
-              background: 'white',
-              border: '1px solid #d9d9d9',
-              borderRadius: 4,
-              marginBottom: 16,
-              maxHeight: '200px',
-              overflowY: 'auto'
-            }}>
-              <div style={{
-                padding: '8px 16px',
-                background: '#fafafa',
-                borderBottom: '1px solid #d9d9d9',
-                fontWeight: 'bold'
-              }}>
+            <div className="search-results-card">
+              <div className="search-results-header">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style={{ display: 'inline-block', marginRight: '8px', verticalAlign: 'text-bottom' }}>
+                  <path fillRule="evenodd" d="M11.5 7a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zm-.82 4.74a6 6 0 111.06-1.06l3.04 3.04a.75.75 0 11-1.06 1.06l-3.04-3.04z"/>
+                </svg>
                 搜尋結果：找到 {searchResults.length} 筆資料（點擊查看詳情）
               </div>
-              {searchResults.map((result, index) => (
+              {searchResults.map((result) => (
                 <div
                   key={result.id}
                   onClick={() => handleSearchResultClick(result)}
-                  style={{
-                    padding: '12px 16px',
-                    borderBottom: index < searchResults.length - 1 ? '1px solid #f0f0f0' : 'none',
-                    cursor: 'pointer',
-                    transition: 'background 0.2s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
+                  className="search-result-item"
                 >
-                  <div style={{ fontWeight: 500, marginBottom: 4 }}>
+                  <div className="search-result-title">
                     {result.city} {result.district} - {result.section_name || ''} {result.parcel_no}
                   </div>
-                  <div style={{ fontSize: 12, color: '#666' }}>
-                    面積: {result.area ? parseFloat(result.area).toFixed(2) : '-'} m² |
+                  <div className="search-result-meta">
+                    面積: {result.area ? parseFloat(result.area).toFixed(2) : '-'} m² •
                     公告現值: {result.announced_value ? result.announced_value.toLocaleString() : '-'} 元/m²
-                    {result.owner_name && ` | 所有權人: ${result.owner_name}`}
+                    {result.owner_name && ` • 所有權人: ${result.owner_name}`}
                   </div>
                 </div>
               ))}
@@ -181,12 +173,8 @@ function AppContent() {
           )}
 
           {/* Map */}
-          <div style={{
-            height: searchResults.length > 0 ? 'calc(100vh - 420px)' : 'calc(100vh - 220px)',
-            background: 'white',
-            borderRadius: 8,
-            overflow: 'hidden',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+          <div className="map-wrapper" style={{
+            height: searchResults.length > 0 ? 'calc(100vh - 420px)' : 'calc(100vh - 220px)'
           }}>
             <MapContainer
               onLandClick={handleLandClick}
