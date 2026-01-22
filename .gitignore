@@ -52,6 +52,11 @@ ALL.zip
 *.kml
 *.xml
 
+# Database dumps
+land_data_dump.sql
+land_data_dump.sql.gz
+*.dump
+
 # Build outputs
 frontend/dist/
 frontend/build/

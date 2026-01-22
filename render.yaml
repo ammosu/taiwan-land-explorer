@@ -1,22 +1,25 @@
+# Render Blueprint for Taiwan Land Explorer
+# Deploys: PostgreSQL + Backend API + Frontend
+
 databases:
-  # PostgreSQL Database with PostGIS
   - name: taiwan-land-db
-    plan: free
-    region: singapore
     databaseName: land_data
     user: landuser
-    postgresMajorVersion: 14
+    region: singapore
+    plan: free
+    # PostGIS extension must be enabled manually after creation:
+    # psql "CONNECTION_STRING" -c "CREATE EXTENSION IF NOT EXISTS postgis;"
 
 services:
-
   # Backend API Service
   - type: web
     name: taiwan-land-api
-    env: docker
+    runtime: docker
     region: singapore
     plan: free
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
+    healthCheckPath: /api/stats/summary
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -26,12 +29,11 @@ services:
         value: "*"
       - key: PORT
         value: "8001"
-    healthCheckPath: /api/stats/summary
 
   # Frontend Static Site
   - type: web
     name: taiwan-land-explorer
-    env: static
+    runtime: static
     region: singapore
     plan: free
     buildCommand: cd frontend && npm install && npm run build
@@ -39,9 +41,9 @@ services:
     envVars:
       - key: VITE_API_URL
         fromService:
-          name: taiwan-land-api
           type: web
-          property: host
+          name: taiwan-land-api
+          property: url
     routes:
       - type: rewrite
         source: /*
