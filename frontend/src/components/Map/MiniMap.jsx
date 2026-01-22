@@ -1,12 +1,39 @@
 /**
  * MiniMap - 迷你地圖組件，顯示選中土地及周邊區域
  */
-import { useState, useEffect, useMemo } from 'react';
-import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
 import { message } from 'antd';
 import { landAPI } from '../../services/api';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+
+/**
+ * MapResizer - 確保地圖正確渲染所有圖磚
+ */
+function MapResizer({ bounds }) {
+  const map = useMap();
+
+  useEffect(() => {
+    // 延遲調整地圖大小，確保所有圖磚載入
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+
+      // 如果有 bounds，則自動調整視野
+      if (bounds) {
+        const leafletBounds = L.latLngBounds(
+          [bounds.minLat, bounds.minLng],
+          [bounds.maxLat, bounds.maxLng]
+        );
+        map.fitBounds(leafletBounds, { padding: [20, 20] });
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [map, bounds]);
+
+  return null;
+}
 
 export default function MiniMap({ land }) {
   const [nearbyLands, setNearbyLands] = useState(null);
@@ -202,6 +229,7 @@ export default function MiniMap({ land }) {
         position: 'relative'
       }}>
         <MapContainer
+          key={`minimap-${land.id}`} // 唯一 key 確保每次重新渲染
           center={mapSettings.center}
           zoom={mapSettings.zoom}
           style={{ width: '100%', height: '100%' }}
@@ -209,11 +237,18 @@ export default function MiniMap({ land }) {
           scrollWheelZoom={false} // 防止意外滾動
           dragging={true}
           doubleClickZoom={true}
+          attributionControl={true}
+          preferCanvas={false}
         >
+          {/* 地圖調整器 - 確保圖磚正確載入 */}
+          <MapResizer bounds={mapSettings.bounds} />
+
           {/* 地圖圖層 */}
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            maxZoom={19}
+            minZoom={1}
           />
 
           {/* 周邊土地（背景層）*/}
